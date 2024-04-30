@@ -1,34 +1,29 @@
 import json
-import logging
 import pickle
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-"""Read wiktioanry data dump and return list of dict of words"""
-def read_verbs():
+def read_verbs() -> list[dict]:
     entries = []
     with open("data/verb.json") as json_file:
         for line in json_file:
             word_entry = json.loads(line)
-            # logger.debug(f"{word_entry.keys()}")
             entries.append(word_entry)
     return entries
 
-def concatenate(iterable, sep=','):
+
+def concatenate(iterable : list, sep=',') -> str:
     res = iterable[0]
     for s in iterable[1:]:
         res += (sep + s)
     return res
 
-"""return true if I want this word."""
-def is_good_word(entry:dict):
-    good_words = ["feien", "trinkst"]
+
+def is_good_word(entry : dict, good_words : list[str]) -> bool:
     if entry["word"] in good_words:
         return True
     return False
 
-def select_conjugation(entry):
+
+def select_conjugation(entry : dict) -> dict[str, str]:
     my_tags = ['indicative', 'present']
     conjs = {'verb': entry['word'],}
     j = 0
@@ -40,17 +35,28 @@ def select_conjugation(entry):
     return conjs
 
 
-def construct_conj_table(entries):
+def construct_conj_table(entries : list[dict]) -> list[dict]:
     conjs = []
+
+    good_words = []
+    with open("data/good_words.txt") as f:
+        for line in f:
+            good_words.append(line.strip())
+
     for entry in entries:
-        if is_good_word(entry):
+        if is_good_word(entry, good_words):
             conjs.append(select_conjugation(entry))
     return conjs
+
 
 def create_conj_db():
     entries = read_verbs()
     conjs = construct_conj_table(entries)
     fname = "verb_dict.pyobj"
-    pickle.dumb(conjs, "../data/"+fname)
+    
+    with open("data/" + fname, 'wb') as f:
+        pickle.dump(conjs, f)
 
 
+if __name__ == "__main__":
+    create_conj_db()
