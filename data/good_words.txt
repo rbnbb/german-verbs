@@ -1,3 +1,14 @@
 essen
 trinken
 haben
+lesen
+sein
+verstehen
+sprechen
+spielen
+lernen
+gehen
+mögen
+sehen
+schreiben
+wollen
